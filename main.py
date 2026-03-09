@@ -11,5 +11,10 @@ def main():
     # initalizing init command
     init_parser = subparsers.add_parser("init", help = "Initalize the repo")
     args = parser.parse_args()
-    print(args)
+
+    if not args.command:
+        parser.print_help()
+        return
+    
+    
 main()
