@@ -95,8 +95,6 @@ class Repo:
     def save_index(self, index):
         self.index_file.write_text(json.dumps(index,indent = 2))
     
-    def add_dir(self):
-        pass
     # 4 types of objects -> BLOB, COMMIT, TREES, TAGS
     def add_file(self,path: str):
         full_path = self.path/path
@@ -116,10 +114,28 @@ class Repo:
 
         print(f"Added {path}")
 
-    def add_dir(self):
-        pass
-    def add_path(self,path:str) -> None:
-        full_path = self.path/path 
+    def add_dir(self,path : str):
+        full_path = self.path/path
+        if not full_path.exists():
+            raise FileNotFoundError(f"Path {path} does not exist!")
+        if not full_path.is_dir():
+            raise ValueError(f"{path} is not a directory!")
+        added_count = 0
+        for fpath in full_path.rglob('*'):
+            if ".mygit" in fpath.parts:
+                    continue
+            fpath_rel = str(fpath.relative_to(self.path))
+            if fpath.is_file():
+                self.add_file(fpath_rel)
+                added_count +=1
+    
+        if added_count>0 :
+            print(f"Added {added_count} files from director {path}")
+        else :
+            print(f"no new files in directory {path}")
+        
+    def add_path(self, path: str) -> None:
+        full_path = self.path / path 
         if not full_path.exists():
             raise FileNotFoundError(f"Path {path} not found")
         if full_path.is_file():
